@@ -1,6 +1,5 @@
 package com.diya.controller;
 
-import java.util.ArrayList;
 import java.util.List;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -12,46 +11,42 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.diya.model.Movie;
 import com.diya.model.Video;
+import com.diya.service.VideoService;
 @RestController
 @RequestMapping("/api/videos")
 public class VideoController {
-    private List<Video> videos = new ArrayList<>();
+
+    private final VideoService videoService;
+
+    public VideoController(VideoService videoService) {
+        this.videoService = videoService;
+    }
 
     @GetMapping("/all")
     public List<Video> getAllVideos(){
-        return videos;
+        return videoService.getAllVideos();
     }
 
     @GetMapping("/available")
     public List<Video> getAvailableVideos(){
-        return videos.stream().filter(Video::isAvailable).toList();
+        return videoService.getAvailableVideos();
     }
 
     @PostMapping("/add/movie")
     public String addMovie(@RequestBody Movie movie){
-        videos.add(movie);
+        videoService.addMovie(movie);
         return "added movie: " + movie.getTitle();
     }
 
     @PutMapping("/{title}/rent")
     public String rentVideo(@PathVariable String title){
-        for (Video video : videos) {
-            if (video.getTitle().equals(title)) {
-                video.rentVideo();
-                return "rented video: " + title;
-            }
-        }
-        return "Video not found: " + title;
+        boolean rented = videoService.rentVideo(title);
+        return rented ? "rented video: " + title : "Video not found: " + title;
     }
 
     @PutMapping("/{title}/return")
     public String returnVideo(@PathVariable String title){
-        for (Video video : videos) {
-            if (video.getTitle().equals(title)) {
-                video.returnVideo();
-                return "returned video: " + title;
-            }
-        }
-        return "Video not found: " + title;
+        boolean returned = videoService.returnVideo(title);
+        return returned ? "returned video: " + title : "Video not found: " + title;
     }
 }

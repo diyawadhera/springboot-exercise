@@ -1,6 +1,11 @@
 package com.diya.model;
 
 public class Movie extends Video {
+    // No-args constructor needed for Jackson deserialization
+    public Movie() {
+        super("", "");
+    }
+
     // Constructor
     public Movie(String title, String genre) {
         super(title, genre);
