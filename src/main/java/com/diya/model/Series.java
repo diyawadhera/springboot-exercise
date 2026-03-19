@@ -1,5 +1,8 @@
 package com.diya.model;
 
+import jakarta.persistence.Entity;
+
+@Entity
 public class Series extends Video {
     // No-args constructor needed for Jackson deserialization
     public Series() {

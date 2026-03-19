@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 
 import com.diya.model.Movie;
 import com.diya.model.Video;
+import com.diya.repository.VideoRepository;
 
 /**
  * Concrete service implementation that manages an in-memory video collection.
@@ -15,44 +16,62 @@ import com.diya.model.Video;
 @Service
 public class VideoServiceImpl implements VideoService {
 
-    private final List<Video> videos = new ArrayList<>();
+    private final VideoRepository videoRepository; // This will be used for database operations
+
+    public VideoServiceImpl(VideoRepository videoRepository) {
+        this.videoRepository = videoRepository;
+    }
 
     @Override
     public List<Video> getAllVideos() {
-        return List.copyOf(videos);
+        return videoRepository.findAll(); // Fetch all videos from the database
     }
 
     @Override
     public List<Video> getAvailableVideos() {
-        return videos.stream().filter(Video::isAvailable).toList();
+        return videoRepository.findByAvailableTrue(); // Fetch only available videos from the database
     }
 
     @Override
     public void addMovie(Movie movie) {
-        videos.add(movie);
+        videoRepository.save(movie); // Save the new movie to the database
     }
 
     @Override
     public boolean rentVideo(String title) {
-        Optional<Video> optional = findByTitle(title);
+        Optional<Video> optional = videoRepository.findByTitle(title);
+
         if (optional.isPresent()) {
-            optional.get().rentVideo();
+            Video video = optional.get();
+
+            if (!video.isAvailable()) {
+                return false; // already rented
+            }
+
+            video.rentVideo(); // domain logic (unchanged)
+            videoRepository.save(video); // ✅ persist change
             return true;
         }
+
         return false;
     }
 
     @Override
     public boolean returnVideo(String title) {
-        Optional<Video> optional = findByTitle(title);
+        Optional<Video> optional = videoRepository.findByTitle(title);
+
         if (optional.isPresent()) {
-            optional.get().returnVideo();
+            Video video = optional.get();
+
+            video.returnVideo(); // domain logic (unchanged)
+            videoRepository.save(video); // ✅ persist change
             return true;
         }
+
         return false;
     }
 
     private Optional<Video> findByTitle(String title) {
-        return videos.stream().filter(v -> v.getTitle().equals(title)).findFirst();
+        return videoRepository.findByTitle(title);
     }
 }

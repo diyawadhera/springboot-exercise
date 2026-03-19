@@ -1,7 +1,19 @@
 package com.diya.model;
 
 
+import jakarta.persistence.Id;
+
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+
+@Entity
 public abstract class Video {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
     private String title;
     private String genre;
     private boolean available;
