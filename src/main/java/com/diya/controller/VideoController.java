@@ -41,12 +41,12 @@ public class VideoController {
     @PutMapping("/{title}/rent")
     public String rentVideo(@PathVariable String title){
         boolean rented = videoService.rentVideo(title);
-        return rented ? "rented video: " + title : "Video not found: " + title;
+        return rented ? "rented video: " + title : "Some issue occurred while renting: " + title;
     }
 
     @PutMapping("/{title}/return")
     public String returnVideo(@PathVariable String title){
         boolean returned = videoService.returnVideo(title);
-        return returned ? "returned video: " + title : "Video not found: " + title;
+        return returned ? "returned video: " + title : "Some issue occurred while returning: " + title;
     }
 }
